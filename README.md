@@ -1,5 +1,5 @@
 This Project Which we had made is a Problem Statement for SIH ( Smart India Hackthon ). <br>
-This Project is the 2nd Statement we choosed to do in for Hackthon.<br>
+This Project is the 2nd Statement we choosed to do for Hackthon.<br>
 <h3>Details</h3>
 Yeah.. well This Project is used to Detect Craters on Moon Which are Taken From Orbiter High Resolution Camera (OHRC) And 
 This project aims to enhance (Low Light Image Enhancement) the feeble light reflected from PSR( Permanently Shadowed Regions) regions of Lunar craters into a better SNR(Signal to Noise Ratio) image for interpretations.<br>
