@@ -3,10 +3,8 @@ import cv2
 import numpy as np
 import torch
 import torchvision.transforms as T
-from PIL import Image
 import matplotlib.pyplot as plt
 from skimage import restoration, exposure, filters
-from skimage.util import random_noise
 from skimage.restoration import denoise_nl_means, estimate_sigma
 from skimage.feature import blob_doh
 import io
@@ -69,16 +67,17 @@ def low_light_noise_removal(image):
     if len(image.shape) == 3:
         image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
+    # Apply CLAHE for contrast enhancement
     clahe = exposure.equalize_adapthist(image, clip_limit=0.03)
-    noisy_image = random_noise(clahe, mode='gaussian', var=0.01)
 
-    sigma_est = np.mean(restoration.estimate_sigma(noisy_image))
+    # Estimate noise and apply denoising directly to the enhanced image
+    sigma_est = np.mean(restoration.estimate_sigma(clahe))
     denoised_image = restoration.denoise_nl_means(
-        noisy_image, h=1.15 * sigma_est, fast_mode=True,
+        clahe, h=1.15 * sigma_est, fast_mode=True,
         patch_size=5, patch_distance=6
     )
 
-    return noisy_image, denoised_image
+    return clahe, denoised_image
 
 
 def enhance_contrast_and_denoise(image):
@@ -205,6 +204,7 @@ if uploaded_file is not None:
                 plt.savefig(buf, format='png', bbox_inches='tight', dpi=150)
                 buf.seek(0)
                 st.image(buf, caption=f"Detected {len(blobs)} Boulders/Craters", use_container_width=True)
+                buf.close()
                 plt.close()
 
                 st.info(f"Found {len(blobs)} potential boulders/craters in the image.")
@@ -215,11 +215,11 @@ if uploaded_file is not None:
 
         if st.button("Apply Noise Removal", key="noise"):
             with st.spinner("Removing noise..."):
-                noisy, denoised = low_light_noise_removal(gray_image)
+                enhanced, denoised = low_light_noise_removal(gray_image)
 
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.image(noisy, caption="Noisy Image", use_container_width=True, clamp=True)
+                    st.image(enhanced, caption="Enhanced Image (CLAHE)", use_container_width=True, clamp=True)
                 with col2:
                     st.image(denoised, caption="Denoised Image", use_container_width=True, clamp=True)
 
